@@ -16,6 +16,7 @@ The app is designed to stay small and avoid shelling out to tools like `top` or 
 - No Dock icon
 - CPU and memory updates every 1, 2, or 3 seconds
 - Default refresh interval set to 3 seconds to minimize runtime overhead
+- Optional launch-at-login toggle
 - Compact menu bar label like `C16% M84%`
 - Detail panel with system stats
 - Pressure states: `Low`, `Medium`, `High`
@@ -96,6 +97,12 @@ For public distribution, the recommended path is:
 4. Publish a notarized `.zip` or `.dmg` in GitHub Releases
 
 For a first release, a notarized `.zip` is the simplest option. A `.dmg` gives a nicer installation experience and is a good next step.
+
+## Availability
+
+PressureBar is available on the Mac App Store:
+
+- [PressureBar on the App Store](https://apps.apple.com/us/app/pressurebar/id6762185705)
 
 ## How The Calculations Work
 

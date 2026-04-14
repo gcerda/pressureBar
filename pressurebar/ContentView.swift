@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var monitor: SystemMonitorModel
+    @ObservedObject var launchAtLogin: LaunchAtLoginManager
     @State private var isShowingAbout = false
 
     var body: some View {
@@ -20,6 +21,9 @@ struct ContentView: View {
         }
         .padding(16)
         .frame(width: 300)
+        .task {
+            launchAtLogin.refreshStatus()
+        }
     }
 
     private var header: some View {
@@ -81,12 +85,20 @@ struct ContentView: View {
             .pickerStyle(.segmented)
 
             HStack {
+                Toggle(
+                    "Launch at login",
+                    isOn: Binding(
+                        get: { launchAtLogin.isEnabled },
+                        set: { launchAtLogin.setEnabled($0) }
+                    )
+                )
+
+                Spacer()
+
                 Button("Quit PressureBar") {
                     NSApplication.shared.terminate(nil)
                 }
                 .keyboardShortcut("q")
-
-                Spacer()
             }
         }
     }

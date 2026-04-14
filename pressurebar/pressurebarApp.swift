@@ -10,10 +10,11 @@ import SwiftUI
 @main
 struct PressureBarApp: App {
     @StateObject private var monitor = SystemMonitorModel()
+    @StateObject private var launchAtLogin = LaunchAtLoginManager()
 
     var body: some Scene {
         MenuBarExtra {
-            ContentView(monitor: monitor)
+            ContentView(monitor: monitor, launchAtLogin: launchAtLogin)
         } label: {
             MenuBarLabel(snapshot: monitor.snapshot)
         }
