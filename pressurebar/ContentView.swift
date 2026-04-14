@@ -6,54 +6,156 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @ObservedObject var monitor: SystemMonitorModel
+    @State private var isShowingAbout = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        VStack(alignment: .leading, spacing: 14) {
+            header
+            metrics
+            Divider()
+            controls
+        }
+        .padding(16)
+        .frame(width: 300)
+    }
+
+    private var header: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("PressureBar")
+                    .font(.headline)
+
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(monitor.snapshot.pressure.color)
+                        .frame(width: 8, height: 8)
+
+                    Text(monitor.snapshot.pressure.description)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
                 }
-                .onDelete(perform: deleteItems)
             }
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-            .toolbar {
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
+
+            Spacer()
+
+            Button {
+                isShowingAbout.toggle()
+            } label: {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 15, weight: .semibold))
             }
-        } detail: {
-            Text("Select an item")
+            .buttonStyle(.plain)
+            .popover(isPresented: $isShowingAbout, arrowEdge: .top) {
+                AboutView()
+            }
         }
     }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+    private var metrics: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            MetricRow(title: "CPU", value: monitor.snapshot.cpuText)
+            MetricRow(title: "Memory used", value: monitor.snapshot.memoryUsedText)
+            MetricRow(title: "Memory usage", value: monitor.snapshot.memoryUsageText)
+            MetricRow(title: "Available", value: monitor.snapshot.availableMemoryText)
+            MetricRow(title: "Swap used", value: monitor.snapshot.swapUsedText)
+            MetricRow(title: "Refresh", value: monitor.refreshIntervalText)
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+    private var controls: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Picker(
+                "Refresh",
+                selection: Binding(
+                    get: { monitor.refreshInterval },
+                    set: { monitor.refreshInterval = $0 }
+                )
+            ) {
+                Text("1 s").tag(1.0)
+                Text("2 s").tag(2.0)
+                Text("3 s").tag(3.0)
+            }
+            .pickerStyle(.segmented)
+
+            HStack {
+                Button("Quit PressureBar") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .keyboardShortcut("q")
+
+                Spacer()
             }
         }
     }
 }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+private struct MetricRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .monospacedDigit()
+        }
+    }
+}
+
+struct MenuBarLabel: View {
+    let snapshot: SystemSnapshot
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: snapshot.pressure.symbolName)
+                .font(.system(size: 12, weight: .semibold))
+            Text(snapshot.menuBarText)
+                .monospacedDigit()
+        }
+    }
+}
+
+private struct AboutView: View {
+    private let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+    private let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("PressureBar")
+                .font(.headline)
+
+            DetailRow(title: "Version", value: "\(version) (\(build))")
+            DetailRow(title: "Author", value: "Gabriel Cerdá")
+            DetailRow(title: "Website", value: "www.inoshi4.com")
+
+            Divider()
+
+            Text("Lightweight menu bar monitor for CPU and memory pressure.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(width: 260)
+    }
+}
+
+private struct DetailRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .textSelection(.enabled)
+        }
+    }
 }

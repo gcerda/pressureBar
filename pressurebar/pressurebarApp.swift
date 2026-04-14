@@ -6,27 +6,17 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @main
-struct pressurebarApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+struct PressureBarApp: App {
+    @StateObject private var monitor = SystemMonitorModel()
 
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        MenuBarExtra {
+            ContentView(monitor: monitor)
+        } label: {
+            MenuBarLabel(snapshot: monitor.snapshot)
         }
-        .modelContainer(sharedModelContainer)
+        .menuBarExtraStyle(.window)
     }
 }
