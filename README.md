@@ -15,6 +15,7 @@ The app is designed to stay small and avoid shelling out to tools like `top` or 
 - Native macOS menu bar app
 - No Dock icon
 - CPU and memory updates every 1, 2, or 3 seconds
+- Default refresh interval set to 3 seconds to minimize runtime overhead
 - Compact menu bar label like `C16% M84%`
 - Detail panel with system stats
 - Pressure states: `Low`, `Medium`, `High`
@@ -28,8 +29,16 @@ The app is designed to stay small and avoid shelling out to tools like `top` or 
 
 ## Requirements
 
-- macOS
+- macOS 14.6 or newer
 - Xcode 26 or newer
+
+## Supported macOS Version
+
+PressureBar currently targets:
+
+- macOS 14.6+
+
+This keeps the app compatible with modern macOS versions while still avoiding an unnecessarily high minimum deployment target.
 
 ## How To Run
 
@@ -76,6 +85,17 @@ If the process stays running during development, you can also stop it from Termi
 ```bash
 pkill -x pressurebar
 ```
+
+## Distribution
+
+For public distribution, the recommended path is:
+
+1. Sign the app with `Developer ID Application`
+2. Keep `Hardened Runtime` enabled
+3. Notarize the final artifact with Apple
+4. Publish a notarized `.zip` or `.dmg` in GitHub Releases
+
+For a first release, a notarized `.zip` is the simplest option. A `.dmg` gives a nicer installation experience and is a good next step.
 
 ## How The Calculations Work
 

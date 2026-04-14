@@ -131,7 +131,7 @@ private struct AboutView: View {
 
             DetailRow(title: "Version", value: "\(version) (\(build))")
             DetailRow(title: "Author", value: "Gabriel Cerdá")
-            DetailRow(title: "Website", value: "www.inoshi4.com")
+            LinkRow(title: "Website", label: "www.inoshi4.com", destination: "https://www.inoshi4.com")
 
             Divider()
 
@@ -142,6 +142,26 @@ private struct AboutView: View {
         }
         .padding(14)
         .frame(width: 260)
+    }
+}
+
+private struct LinkRow: View {
+    let title: String
+    let label: String
+    let destination: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            if let url = URL(string: destination) {
+                Link(label, destination: url)
+            } else {
+                Text(label)
+            }
+        }
     }
 }
 

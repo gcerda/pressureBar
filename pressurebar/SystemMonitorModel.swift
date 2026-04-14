@@ -12,7 +12,7 @@ final class SystemMonitorModel: ObservableObject {
 
     private let service: SystemStatsService
 
-    init(snapshot: SystemSnapshot, refreshInterval: Double = 1.0, startService: Bool = true) {
+    init(snapshot: SystemSnapshot, refreshInterval: Double = 3.0, startService: Bool = true) {
         self.snapshot = snapshot
         self.refreshInterval = refreshInterval
         self.service = SystemStatsService()
